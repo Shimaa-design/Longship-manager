@@ -3,21 +3,76 @@
 // the *figma document* via the figma global object.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 // Runs this code if the plugin is run in Figma
 if (figma.editorType === 'figma') {
-    // This plugin will open a window to prompt the user to enter a number, and
-    // it will then create that many rectangles on the screen.
     // This shows the HTML page in "ui.html".
-    figma.showUI(__html__);
+    figma.showUI(__html__, { width: 400, height: 600 });
     // Calls to "parent.postMessage" from within the HTML page will trigger this
     // callback. The callback will be passed the "pluginMessage" property of the
     // posted message.
-    figma.ui.onmessage = (msg) => {
-        // One way of distinguishing between different types of messages sent from
-        // your HTML page is to use an object with a "type" property like this.
+    figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
+        if (msg.type === 'read-variables') {
+            try {
+                // Get all local variables in the current file
+                const localVariables = yield figma.variables.getLocalVariablesAsync();
+                if (localVariables.length === 0) {
+                    figma.ui.postMessage({
+                        type: 'variables-result',
+                        variables: [],
+                        error: null
+                    });
+                    return;
+                }
+                // Get all variable collections to access mode information
+                const collections = yield figma.variables.getLocalVariableCollectionsAsync();
+                // Create a map of collection id to modes for easier lookup
+                const collectionModes = {};
+                collections.forEach(collection => {
+                    collectionModes[collection.id] = collection.modes;
+                });
+                // Process each variable
+                const variableInfos = [];
+                for (const variable of localVariables) {
+                    const modes = collectionModes[variable.variableCollectionId] || [];
+                    const values = modes.map(mode => ({
+                        mode: mode.name,
+                        value: variable.valuesByMode[mode.id]
+                    }));
+                    variableInfos.push({
+                        id: variable.id,
+                        name: variable.name,
+                        resolvedType: variable.resolvedType,
+                        values: values
+                    });
+                }
+                // Send the variables back to the UI
+                figma.ui.postMessage({
+                    type: 'variables-result',
+                    variables: variableInfos,
+                    error: null
+                });
+            }
+            catch (error) {
+                console.error('Error reading variables:', error);
+                figma.ui.postMessage({
+                    type: 'variables-result',
+                    variables: [],
+                    error: error instanceof Error ? error.message : 'Unknown error occurred'
+                });
+            }
+        }
+        // Original shape creation functionality
         if (msg.type === 'create-shapes') {
-            // This plugin creates rectangles on the screen.
-            const numberOfRectangles = msg.count;
+            const numberOfRectangles = msg.count || 5;
             const nodes = [];
             for (let i = 0; i < numberOfRectangles; i++) {
                 const rect = figma.createRectangle();
@@ -28,31 +83,23 @@ if (figma.editorType === 'figma') {
             }
             figma.currentPage.selection = nodes;
             figma.viewport.scrollAndZoomIntoView(nodes);
+            // Close plugin after creating shapes
+            figma.closePlugin();
         }
-        // Make sure to close the plugin when you're done. Otherwise the plugin will
-        // keep running, which shows the cancel button at the bottom of the screen.
-        figma.closePlugin();
-    };
+        if (msg.type === 'cancel') {
+            figma.closePlugin();
+        }
+    });
 }
 // Runs this code if the plugin is run in FigJam
 if (figma.editorType === 'figjam') {
-    // This plugin will open a window to prompt the user to enter a number, and
-    // it will then create that many shapes and connectors on the screen.
-    // This shows the HTML page in "ui.html".
-    figma.showUI(__html__);
-    // Calls to "parent.postMessage" from within the HTML page will trigger this
-    // callback. The callback will be passed the "pluginMessage" property of the
-    // posted message.
+    figma.showUI(__html__, { width: 400, height: 600 });
     figma.ui.onmessage = (msg) => {
-        // One way of distinguishing between different types of messages sent from
-        // your HTML page is to use an object with a "type" property like this.
         if (msg.type === 'create-shapes') {
-            // This plugin creates shapes and connectors on the screen.
-            const numberOfShapes = msg.count;
+            const numberOfShapes = msg.count || 5;
             const nodes = [];
             for (let i = 0; i < numberOfShapes; i++) {
                 const shape = figma.createShapeWithText();
-                // You can set shapeType to one of: 'SQUARE' | 'ELLIPSE' | 'ROUNDED_RECTANGLE' | 'DIAMOND' | 'TRIANGLE_UP' | 'TRIANGLE_DOWN' | 'PARALLELOGRAM_RIGHT' | 'PARALLELOGRAM_LEFT'
                 shape.shapeType = 'ROUNDED_RECTANGLE';
                 shape.x = i * (shape.width + 200);
                 shape.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }];
@@ -73,27 +120,19 @@ if (figma.editorType === 'figjam') {
             }
             figma.currentPage.selection = nodes;
             figma.viewport.scrollAndZoomIntoView(nodes);
+            figma.closePlugin();
         }
-        // Make sure to close the plugin when you're done. Otherwise the plugin will
-        // keep running, which shows the cancel button at the bottom of the screen.
-        figma.closePlugin();
+        if (msg.type === 'cancel') {
+            figma.closePlugin();
+        }
     };
 }
 // Runs this code if the plugin is run in Slides
 if (figma.editorType === 'slides') {
-    // This plugin will open a window to prompt the user to enter a number, and
-    // it will then create that many slides on the screen.
-    // This shows the HTML page in "ui.html".
-    figma.showUI(__html__);
-    // Calls to "parent.postMessage" from within the HTML page will trigger this
-    // callback. The callback will be passed the "pluginMessage" property of the
-    // posted message.
+    figma.showUI(__html__, { width: 400, height: 600 });
     figma.ui.onmessage = (msg) => {
-        // One way of distinguishing between different types of messages sent from
-        // your HTML page is to use an object with a "type" property like this.
         if (msg.type === 'create-shapes') {
-            // This plugin creates slides and puts the user in grid view.
-            const numberOfSlides = msg.count;
+            const numberOfSlides = msg.count || 5;
             const nodes = [];
             for (let i = 0; i < numberOfSlides; i++) {
                 const slide = figma.createSlide();
@@ -101,9 +140,10 @@ if (figma.editorType === 'slides') {
             }
             figma.viewport.slidesView = 'grid';
             figma.currentPage.selection = nodes;
+            figma.closePlugin();
         }
-        // Make sure to close the plugin when you're done. Otherwise the plugin will
-        // keep running, which shows the cancel button at the bottom of the screen.
-        figma.closePlugin();
+        if (msg.type === 'cancel') {
+            figma.closePlugin();
+        }
     };
 }
