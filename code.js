@@ -15,7 +15,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 // Runs this code if the plugin is run in Figma
 if (figma.editorType === 'figma') {
     // This shows the HTML page in "ui.html".
-    figma.showUI(__html__, { width: 400, height: 600 });
+    figma.showUI(__html__, { width: 900, height: 600 });
     // Calls to "parent.postMessage" from within the HTML page will trigger this
     // callback. The callback will be passed the "pluginMessage" property of the
     // posted message.
@@ -28,6 +28,7 @@ if (figma.editorType === 'figma') {
                     figma.ui.postMessage({
                         type: 'variables-result',
                         variables: [],
+                        collections: [],
                         error: null
                     });
                     return;
@@ -51,13 +52,19 @@ if (figma.editorType === 'figma') {
                         id: variable.id,
                         name: variable.name,
                         resolvedType: variable.resolvedType,
-                        values: values
+                        values: values,
+                        collectionId: variable.variableCollectionId
                     });
                 }
-                // Send the variables back to the UI
+                // Send the variables and collections back to the UI
                 figma.ui.postMessage({
                     type: 'variables-result',
                     variables: variableInfos,
+                    collections: collections.map(collection => ({
+                        id: collection.id,
+                        name: collection.name,
+                        modes: collection.modes
+                    })),
                     error: null
                 });
             }
@@ -66,6 +73,7 @@ if (figma.editorType === 'figma') {
                 figma.ui.postMessage({
                     type: 'variables-result',
                     variables: [],
+                    collections: [],
                     error: error instanceof Error ? error.message : 'Unknown error occurred'
                 });
             }
@@ -86,6 +94,10 @@ if (figma.editorType === 'figma') {
             // Close plugin after creating shapes
             figma.closePlugin();
         }
+        if (msg.type === 'resize-window') {
+            // Resize the plugin window
+            figma.ui.resize(msg.width, msg.height);
+        }
         if (msg.type === 'cancel') {
             figma.closePlugin();
         }
@@ -93,7 +105,7 @@ if (figma.editorType === 'figma') {
 }
 // Runs this code if the plugin is run in FigJam
 if (figma.editorType === 'figjam') {
-    figma.showUI(__html__, { width: 400, height: 600 });
+    figma.showUI(__html__, { width: 900, height: 600 });
     figma.ui.onmessage = (msg) => {
         if (msg.type === 'create-shapes') {
             const numberOfShapes = msg.count || 5;
@@ -122,6 +134,10 @@ if (figma.editorType === 'figjam') {
             figma.viewport.scrollAndZoomIntoView(nodes);
             figma.closePlugin();
         }
+        if (msg.type === 'resize-window') {
+            // Resize the plugin window
+            figma.ui.resize(msg.width, msg.height);
+        }
         if (msg.type === 'cancel') {
             figma.closePlugin();
         }
@@ -129,7 +145,7 @@ if (figma.editorType === 'figjam') {
 }
 // Runs this code if the plugin is run in Slides
 if (figma.editorType === 'slides') {
-    figma.showUI(__html__, { width: 400, height: 600 });
+    figma.showUI(__html__, { width: 900, height: 600 });
     figma.ui.onmessage = (msg) => {
         if (msg.type === 'create-shapes') {
             const numberOfSlides = msg.count || 5;
@@ -141,6 +157,10 @@ if (figma.editorType === 'slides') {
             figma.viewport.slidesView = 'grid';
             figma.currentPage.selection = nodes;
             figma.closePlugin();
+        }
+        if (msg.type === 'resize-window') {
+            // Resize the plugin window
+            figma.ui.resize(msg.width, msg.height);
         }
         if (msg.type === 'cancel') {
             figma.closePlugin();

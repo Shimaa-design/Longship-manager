@@ -17,7 +17,8 @@
       color: #0f172a;
       font-size: 14px;
       line-height: 1.4;
-      padding: 16px;
+      height: 100vh;
+      overflow: hidden;
     }
 
     /* Button styles inspired by shadcn */
@@ -162,39 +163,76 @@
       width: 100%;
     }
 
-    /* Variables display */
+    /* Variables table */
     .variables-container {
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 12px;
-      background: #f8fafc;
+      flex: 1;
+      overflow: visible;
     }
 
-    .variable-item {
-      padding: 8px;
-      border-radius: 4px;
-      background: white;
-      margin-bottom: 8px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .variable-name {
-      font-weight: 500;
+    .variables-table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 13px;
-      color: #0f172a;
     }
 
-    .variable-value {
-      font-size: 12px;
-      color: #64748b;
-      margin-top: 2px;
+    .variables-table th {
+      background: #f8fafc;
+      padding: 12px 8px;
+      text-align: left;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
     }
 
-    .variable-type {
+    .variables-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: top;
+    }
+
+    .variables-table tr:hover {
+      background: #f9fafb;
+    }
+
+    .variable-name-cell {
+      font-weight: 500;
+      color: #111827;
+      min-width: 120px;
+      max-width: 150px;
+    }
+
+    .variable-type-cell {
       font-size: 11px;
-      color: #94a3b8;
+      color: #6b7280;
+      min-width: 80px;
+    }
+
+    .mode-column {
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .mode-header {
+      font-size: 11px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .variable-value-cell {
+      font-size: 12px;
+      color: #374151;
+      word-break: break-word;
+    }
+
+    .color-preview {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      margin-right: 6px;
+      border: 1px solid #d1d5db;
+      vertical-align: middle;
     }
 
     .loading {
@@ -210,28 +248,180 @@
       padding: 20px;
       color: #64748b;
     }
+
+    /* Layout styles */
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #f8fafc;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      background: white;
+    }
+
+    .sidebar-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .collection-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .collection-item:hover {
+      background: #e2e8f0;
+    }
+
+    .collection-item.active {
+      background: #0f172a;
+      color: white;
+    }
+
+    .collection-item.active:hover {
+      background: #1e293b;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .main-header {
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      background: white;
+    }
+
+    .main-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .collection-info {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .collection-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .collection-modes {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .mode-badge {
+      display: inline-block;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+      font-size: 11px;
+    }
+
+    /* Resize handle */
+    .resize-handle {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(-45deg, transparent 0%, transparent 30%, #cbd5e1 30%, #cbd5e1 40%, transparent 40%, transparent 60%, #cbd5e1 60%, #cbd5e1 70%, transparent 70%);
+      cursor: nw-resize;
+      z-index: 1000;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .resize-handle:hover {
+      opacity: 1;
+    }
+
+    .resize-handle:active {
+      opacity: 1;
+    }
+
+    /* Ensure the app container can be resized */
+    .app-container {
+      position: relative;
+      min-width: 400px;
+      min-height: 300px;
+    }
   </style>
 </head>
 <body>
-  <div class="space-y-4">
-    <!-- Header Card -->
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Longship Manager</h3>
-        <p class="card-description">Manage your Figma variables and components</p>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Collections</div>
+      </div>
+      <div class="sidebar-content" id="collections-list">
+        <div class="empty-state" id="collections-empty">
+          No collections found
+        </div>
       </div>
     </div>
 
-    <!-- Variables Section -->
-    <div class="card">
-      <div class="card-content space-y-4">
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="main-header">
         <div class="flex items-center justify-between">
-          <h4 style="font-weight: 600;">Variables</h4>
+          <h3 class="card-title">Longship Manager</h3>
           <button id="read-variables" class="btn btn-primary">
             Read Variables
           </button>
         </div>
-        
+      </div>
+      
+      <div class="main-body">
+        <!-- Collection Info -->
+        <div id="collection-info" class="collection-info" style="display: none;">
+          <div class="collection-name" id="selected-collection-name"></div>
+          <div class="collection-modes" id="selected-collection-modes"></div>
+        </div>
+
+        <!-- Variables Section -->
         <div id="variables-display" class="variables-container" style="display: none;">
           <div id="variables-content"></div>
         </div>
@@ -239,26 +429,20 @@
         <div id="variables-status" class="empty-state">
           Click "Read Variables" to load variables from the current file
         </div>
-      </div>
-    </div>
 
-    <!-- Original Shape Creator (keeping for reference) -->
-    <div class="card">
-      <div class="card-content space-y-4">
-        <h4 style="font-weight: 600;">Shape Creator</h4>
-        <div class="space-y-2">
-          <label for="count" style="font-size: 14px; font-weight: 500;">Count:</label>
-          <input id="count" type="number" value="5" class="input">
-        </div>
-        <div class="flex gap-2">
-          <button id="create" class="btn btn-primary">Create Shapes</button>
-          <button id="cancel" class="btn btn-secondary">Cancel</button>
-        </div>
       </div>
     </div>
+    
+    <!-- Resize Handle -->
+    <div class="resize-handle" id="resize-handle"></div>
   </div>
 
   <script>
+    // Global state
+    let allVariables = [];
+    let allCollections = [];
+    let selectedCollectionId = null;
+
     // Variables functionality
     document.getElementById('read-variables').onclick = () => {
       const statusDiv = document.getElementById('variables-status');
@@ -277,40 +461,154 @@
 
     // Handle messages from plugin code
     window.addEventListener('message', (event) => {
-      const { type, variables, error } = event.data.pluginMessage || {};
+      const { type, variables, collections, error } = event.data.pluginMessage || {};
       
       if (type === 'variables-result') {
         const statusDiv = document.getElementById('variables-status');
         const displayDiv = document.getElementById('variables-display');
         const contentDiv = document.getElementById('variables-content');
+        const collectionsList = document.getElementById('collections-list');
+        const collectionsEmpty = document.getElementById('collections-empty');
         
         if (error) {
           statusDiv.innerHTML = `<div style="color: #dc2626;">Error: ${error}</div>`;
           displayDiv.style.display = 'none';
-        } else if (variables && variables.length > 0) {
-          // Hide status and show variables
-          statusDiv.style.display = 'none';
-          displayDiv.style.display = 'block';
-          
-          // Render variables
-          contentDiv.innerHTML = variables.map(variable => `
-            <div class="variable-item">
-              <div class="variable-name">${variable.name}</div>
-              <div class="variable-type">${variable.resolvedType || 'UNKNOWN'}</div>
-              ${variable.values ? variable.values.map(value => `
-                <div class="variable-value">
-                  <span class="badge">${value.mode}</span>
-                  ${formatVariableValue(value.value, variable.resolvedType)}
-                </div>
-              `).join('') : ''}
-            </div>
-          `).join('');
         } else {
-          statusDiv.innerHTML = '<div class="empty-state">No variables found in this file</div>';
-          displayDiv.style.display = 'none';
+          // Store data globally
+          allVariables = variables || [];
+          allCollections = collections || [];
+          
+          // Render collections in sidebar
+          if (allCollections.length > 0) {
+            collectionsEmpty.style.display = 'none';
+            collectionsList.innerHTML = allCollections.map(collection => `
+              <button class="collection-item" data-collection-id="${collection.id}">
+                ${collection.name}
+              </button>
+            `).join('');
+            
+            // Add click handlers to collection items
+            collectionsList.querySelectorAll('.collection-item').forEach(item => {
+              item.addEventListener('click', () => {
+                const collectionId = item.dataset.collectionId;
+                selectCollection(collectionId);
+              });
+            });
+            
+            // Select first collection by default
+            if (allCollections.length > 0) {
+              selectCollection(allCollections[0].id);
+            }
+          } else {
+            collectionsEmpty.style.display = 'block';
+            collectionsList.innerHTML = '<div class="empty-state" id="collections-empty">No collections found</div>';
+          }
+          
+          // Show variables
+          if (allVariables.length > 0) {
+            statusDiv.style.display = 'none';
+            displayDiv.style.display = 'block';
+            renderVariables();
+          } else {
+            statusDiv.innerHTML = '<div class="empty-state">No variables found in this file</div>';
+            displayDiv.style.display = 'none';
+          }
         }
       }
     });
+
+    function selectCollection(collectionId) {
+      selectedCollectionId = collectionId;
+      
+      // Update active state in sidebar
+      document.querySelectorAll('.collection-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.collectionId === collectionId) {
+          item.classList.add('active');
+        }
+      });
+      
+      // Show collection info
+      const collection = allCollections.find(c => c.id === collectionId);
+      if (collection) {
+        const collectionInfo = document.getElementById('collection-info');
+        const collectionName = document.getElementById('selected-collection-name');
+        const collectionModes = document.getElementById('selected-collection-modes');
+        
+        collectionName.textContent = collection.name;
+        collectionModes.innerHTML = collection.modes.map(mode => 
+          `<span class="mode-badge">${mode.name}</span>`
+        ).join('');
+        
+        collectionInfo.style.display = 'block';
+      }
+      
+      // Re-render variables for this collection
+      renderVariables();
+    }
+
+    function renderVariables() {
+      const contentDiv = document.getElementById('variables-content');
+      
+      if (!selectedCollectionId) {
+        contentDiv.innerHTML = '<div class="empty-state">Select a collection to view variables</div>';
+        return;
+      }
+      
+      // Filter variables by selected collection
+      const filteredVariables = allVariables.filter(variable => {
+        // Find the collection for this variable
+        const collection = allCollections.find(c => c.id === variable.collectionId);
+        return collection && collection.id === selectedCollectionId;
+      });
+      
+      if (filteredVariables.length === 0) {
+        contentDiv.innerHTML = '<div class="empty-state">No variables in this collection</div>';
+        return;
+      }
+      
+      // Get the selected collection to access its modes
+      const selectedCollection = allCollections.find(c => c.id === selectedCollectionId);
+      if (!selectedCollection) {
+        contentDiv.innerHTML = '<div class="empty-state">Collection not found</div>';
+        return;
+      }
+      
+      // Create table header
+      const tableHeader = `
+        <table class="variables-table">
+          <thead>
+            <tr>
+              <th class="variable-name-cell">Variable</th>
+              <th class="variable-type-cell">Type</th>
+              ${selectedCollection.modes.map(mode => `
+                <th class="mode-column">
+                  <div class="mode-header">${mode.name}</div>
+                </th>
+              `).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredVariables.map(variable => `
+              <tr>
+                <td class="variable-name-cell">${variable.name}</td>
+                <td class="variable-type-cell">${variable.resolvedType || 'UNKNOWN'}</td>
+                ${selectedCollection.modes.map(mode => {
+                  const value = variable.values.find(v => v.mode === mode.name);
+                  return `
+                    <td class="mode-column variable-value-cell">
+                      ${value ? formatVariableValue(value.value, variable.resolvedType) : '-'}
+                    </td>
+                  `;
+                }).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      
+      contentDiv.innerHTML = tableHeader;
+    }
 
     function formatVariableValue(value, type) {
       if (type === 'COLOR') {
@@ -319,31 +617,82 @@
           const g = Math.round(value.g * 255);
           const b = Math.round(value.b * 255);
           const alpha = value.a !== undefined ? value.a : 1;
-          return `<span style="background: rgba(${r},${g},${b},${alpha}); width: 12px; height: 12px; display: inline-block; border-radius: 2px; margin-right: 4px; border: 1px solid #e2e8f0;"></span>rgba(${r}, ${g}, ${b}, ${alpha})`;
+          return `
+            <div style="display: flex; align-items: center; justify-content: center;">
+              <span class="color-preview" style="background: rgba(${r},${g},${b},${alpha});"></span>
+              <span style="font-size: 11px; color: #6b7280;">${r}, ${g}, ${b}</span>
+            </div>
+          `;
         }
       }
       
-      if (typeof value === 'object') {
-        return JSON.stringify(value);
+      if (type === 'FLOAT' || type === 'STRING') {
+        return `<span style="font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace; font-size: 11px;">${String(value)}</span>`;
       }
       
-      return String(value);
+      if (typeof value === 'object') {
+        return `<span style="font-size: 11px; color: #6b7280;">${JSON.stringify(value)}</span>`;
+      }
+      
+      return `<span style="font-size: 11px;">${String(value)}</span>`;
     }
 
-    // Original shape creator functionality
-    document.getElementById('create').onclick = () => {
-      const textbox = document.getElementById('count');
-      const count = parseInt(textbox.value, 10);
-      parent.postMessage({ 
-        pluginMessage: { type: 'create-shapes', count } 
-      }, '*');
-    };
+    // Cancel functionality
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        parent.postMessage({ 
+          pluginMessage: { type: 'cancel' } 
+        }, '*');
+      }
+    });
 
-    document.getElementById('cancel').onclick = () => {
-      parent.postMessage({ 
-        pluginMessage: { type: 'cancel' } 
+    // Resize handle functionality
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+
+    const resizeHandle = document.getElementById('resize-handle');
+    
+    resizeHandle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = parseInt(document.defaultView.getComputedStyle(document.body).width, 10);
+      startHeight = parseInt(document.defaultView.getComputedStyle(document.body).height, 10);
+      
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+      
+      const newWidth = startWidth + e.clientX - startX;
+      const newHeight = startHeight + e.clientY - startY;
+      
+      // Set minimum dimensions
+      const minWidth = 400;
+      const minHeight = 300;
+      
+      const finalWidth = Math.max(newWidth, minWidth);
+      const finalHeight = Math.max(newHeight, minHeight);
+      
+      // Update the plugin window size
+      parent.postMessage({
+        pluginMessage: {
+          type: 'resize-window',
+          width: finalWidth,
+          height: finalHeight
+        }
       }, '*');
-    };
+    });
+
+    document.addEventListener('mouseup', () => {
+      isResizing = false;
+    });
+
+    // Prevent text selection while resizing
+    resizeHandle.addEventListener('selectstart', (e) => {
+      e.preventDefault();
+    });
   </script>
 </body>
 </html>
