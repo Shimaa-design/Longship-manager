@@ -449,9 +449,13 @@
       const displayDiv = document.getElementById('variables-display');
       const contentDiv = document.getElementById('variables-content');
       
-      // Show loading state
-      statusDiv.innerHTML = '<div class="loading">Reading variables...</div>';
-      displayDiv.style.display = 'none';
+      // Check if elements exist before accessing their properties
+      if (statusDiv) {
+        statusDiv.innerHTML = '<div class="loading">Reading variables...</div>';
+      }
+      if (displayDiv) {
+        displayDiv.style.display = 'none';
+      }
       
       // Send message to plugin code
       parent.postMessage({ 
@@ -471,8 +475,12 @@
         const collectionsEmpty = document.getElementById('collections-empty');
         
         if (error) {
-          statusDiv.innerHTML = `<div style="color: #dc2626;">Error: ${error}</div>`;
-          displayDiv.style.display = 'none';
+          if (statusDiv) {
+            statusDiv.innerHTML = `<div style="color: #dc2626;">Error: ${error}</div>`;
+          }
+          if (displayDiv) {
+            displayDiv.style.display = 'none';
+          }
         } else {
           // Store data globally
           allVariables = variables || [];
@@ -480,38 +488,54 @@
           
           // Render collections in sidebar
           if (allCollections.length > 0) {
-            collectionsEmpty.style.display = 'none';
-            collectionsList.innerHTML = allCollections.map(collection => `
-              <button class="collection-item" data-collection-id="${collection.id}">
-                ${collection.name}
-              </button>
-            `).join('');
-            
-            // Add click handlers to collection items
-            collectionsList.querySelectorAll('.collection-item').forEach(item => {
-              item.addEventListener('click', () => {
-                const collectionId = item.dataset.collectionId;
-                selectCollection(collectionId);
+            if (collectionsEmpty) {
+              collectionsEmpty.style.display = 'none';
+            }
+            if (collectionsList) {
+              collectionsList.innerHTML = allCollections.map(collection => `
+                <button class="collection-item" data-collection-id="${collection.id}">
+                  ${collection.name}
+                </button>
+              `).join('');
+              
+              // Add click handlers to collection items
+              collectionsList.querySelectorAll('.collection-item').forEach(item => {
+                item.addEventListener('click', () => {
+                  const collectionId = item.dataset.collectionId;
+                  selectCollection(collectionId);
+                });
               });
-            });
+            }
             
             // Select first collection by default
             if (allCollections.length > 0) {
               selectCollection(allCollections[0].id);
             }
           } else {
-            collectionsEmpty.style.display = 'block';
-            collectionsList.innerHTML = '<div class="empty-state" id="collections-empty">No collections found</div>';
+            if (collectionsEmpty) {
+              collectionsEmpty.style.display = 'block';
+            }
+            if (collectionsList) {
+              collectionsList.innerHTML = '<div class="empty-state" id="collections-empty">No collections found</div>';
+            }
           }
           
           // Show variables
           if (allVariables.length > 0) {
-            statusDiv.style.display = 'none';
-            displayDiv.style.display = 'block';
+            if (statusDiv) {
+              statusDiv.style.display = 'none';
+            }
+            if (displayDiv) {
+              displayDiv.style.display = 'block';
+            }
             renderVariables();
           } else {
-            statusDiv.innerHTML = '<div class="empty-state">No variables found in this file</div>';
-            displayDiv.style.display = 'none';
+            if (statusDiv) {
+              statusDiv.innerHTML = '<div class="empty-state">No variables found in this file</div>';
+            }
+            if (displayDiv) {
+              displayDiv.style.display = 'none';
+            }
           }
         }
       }
@@ -535,12 +559,17 @@
         const collectionName = document.getElementById('selected-collection-name');
         const collectionModes = document.getElementById('selected-collection-modes');
         
-        collectionName.textContent = collection.name;
-        collectionModes.innerHTML = collection.modes.map(mode => 
-          `<span class="mode-badge">${mode.name}</span>`
-        ).join('');
-        
-        collectionInfo.style.display = 'block';
+        if (collectionName) {
+          collectionName.textContent = collection.name;
+        }
+        if (collectionModes) {
+          collectionModes.innerHTML = collection.modes.map(mode => 
+            `<span class="mode-badge">${mode.name}</span>`
+          ).join('');
+        }
+        if (collectionInfo) {
+          collectionInfo.style.display = 'block';
+        }
       }
       
       // Re-render variables for this collection

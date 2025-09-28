@@ -37,30 +37,41 @@ if (figma.editorType === 'figma') {
                 const collections = yield figma.variables.getLocalVariableCollectionsAsync();
                 // Create a map of collection id to modes for easier lookup
                 const collectionModes = {};
-                collections.forEach(collection => {
+                collections.forEach((collection) => {
                     collectionModes[collection.id] = collection.modes;
                 });
                 // Process each variable
                 const variableInfos = [];
-                for (const variable of localVariables) {
-                    const modes = collectionModes[variable.variableCollectionId] || [];
-                    const values = modes.map(mode => ({
-                        mode: mode.name,
-                        value: variable.valuesByMode[mode.id]
-                    }));
-                    variableInfos.push({
-                        id: variable.id,
-                        name: variable.name,
-                        resolvedType: variable.resolvedType,
-                        values: values,
-                        collectionId: variable.variableCollectionId
-                    });
+                for (const variableRef of localVariables) {
+                    try {
+                        // Get the full variable object using the ID
+                        const variable = yield figma.variables.getVariableByIdAsync(variableRef.id);
+                        const modes = collectionModes[variable.variableCollectionId] || [];
+                        const values = modes.map(mode => {
+                            // Access the value for this mode
+                            const value = variable.valuesByMode[mode.id];
+                            return {
+                                mode: mode.name,
+                                value: value
+                            };
+                        });
+                        variableInfos.push({
+                            id: variable.id,
+                            name: variable.name,
+                            resolvedType: variable.resolvedType,
+                            values: values,
+                            collectionId: variable.variableCollectionId
+                        });
+                    }
+                    catch (error) {
+                        console.error(`Error processing variable ${variableRef.id}:`, error);
+                    }
                 }
                 // Send the variables and collections back to the UI
                 figma.ui.postMessage({
                     type: 'variables-result',
                     variables: variableInfos,
-                    collections: collections.map(collection => ({
+                    collections: collections.map((collection) => ({
                         id: collection.id,
                         name: collection.name,
                         modes: collection.modes
@@ -78,22 +89,6 @@ if (figma.editorType === 'figma') {
                 });
             }
         }
-        // Original shape creation functionality
-        if (msg.type === 'create-shapes') {
-            const numberOfRectangles = msg.count || 5;
-            const nodes = [];
-            for (let i = 0; i < numberOfRectangles; i++) {
-                const rect = figma.createRectangle();
-                rect.x = i * 150;
-                rect.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }];
-                figma.currentPage.appendChild(rect);
-                nodes.push(rect);
-            }
-            figma.currentPage.selection = nodes;
-            figma.viewport.scrollAndZoomIntoView(nodes);
-            // Close plugin after creating shapes
-            figma.closePlugin();
-        }
         if (msg.type === 'resize-window') {
             // Resize the plugin window
             figma.ui.resize(msg.width, msg.height);
@@ -107,33 +102,6 @@ if (figma.editorType === 'figma') {
 if (figma.editorType === 'figjam') {
     figma.showUI(__html__, { width: 900, height: 600 });
     figma.ui.onmessage = (msg) => {
-        if (msg.type === 'create-shapes') {
-            const numberOfShapes = msg.count || 5;
-            const nodes = [];
-            for (let i = 0; i < numberOfShapes; i++) {
-                const shape = figma.createShapeWithText();
-                shape.shapeType = 'ROUNDED_RECTANGLE';
-                shape.x = i * (shape.width + 200);
-                shape.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }];
-                figma.currentPage.appendChild(shape);
-                nodes.push(shape);
-            }
-            for (let i = 0; i < numberOfShapes - 1; i++) {
-                const connector = figma.createConnector();
-                connector.strokeWeight = 8;
-                connector.connectorStart = {
-                    endpointNodeId: nodes[i].id,
-                    magnet: 'AUTO',
-                };
-                connector.connectorEnd = {
-                    endpointNodeId: nodes[i + 1].id,
-                    magnet: 'AUTO',
-                };
-            }
-            figma.currentPage.selection = nodes;
-            figma.viewport.scrollAndZoomIntoView(nodes);
-            figma.closePlugin();
-        }
         if (msg.type === 'resize-window') {
             // Resize the plugin window
             figma.ui.resize(msg.width, msg.height);
@@ -147,17 +115,6 @@ if (figma.editorType === 'figjam') {
 if (figma.editorType === 'slides') {
     figma.showUI(__html__, { width: 900, height: 600 });
     figma.ui.onmessage = (msg) => {
-        if (msg.type === 'create-shapes') {
-            const numberOfSlides = msg.count || 5;
-            const nodes = [];
-            for (let i = 0; i < numberOfSlides; i++) {
-                const slide = figma.createSlide();
-                nodes.push(slide);
-            }
-            figma.viewport.slidesView = 'grid';
-            figma.currentPage.selection = nodes;
-            figma.closePlugin();
-        }
         if (msg.type === 'resize-window') {
             // Resize the plugin window
             figma.ui.resize(msg.width, msg.height);

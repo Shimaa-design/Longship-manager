@@ -5,6 +5,7 @@
 
 declare const figma: any;
 declare const __html__: string;
+declare const console: any;
 
 interface VariableInfo {
   id: string;
@@ -46,35 +47,46 @@ if (figma.editorType === 'figma') {
         
         // Create a map of collection id to modes for easier lookup
         const collectionModes: {[key: string]: {id: string, name: string}[]} = {};
-        collections.forEach(collection => {
+        collections.forEach((collection: any) => {
           collectionModes[collection.id] = collection.modes;
         });
 
         // Process each variable
         const variableInfos: VariableInfo[] = [];
         
-        for (const variable of localVariables) {
-          const modes = collectionModes[variable.variableCollectionId] || [];
-          
-          const values = modes.map(mode => ({
-            mode: mode.name,
-            value: variable.valuesByMode[mode.id]
-          }));
+        for (const variableRef of localVariables) {
+          try {
+            // Get the full variable object using the ID
+            const variable = await figma.variables.getVariableByIdAsync(variableRef.id);
+            const modes = collectionModes[variable.variableCollectionId] || [];
+            
+            const values = modes.map(mode => {
+              // Access the value for this mode
+              const value = variable.valuesByMode[mode.id];
+              
+              return {
+                mode: mode.name,
+                value: value
+              };
+            });
 
-          variableInfos.push({
-            id: variable.id,
-            name: variable.name,
-            resolvedType: variable.resolvedType,
-            values: values,
-            collectionId: variable.variableCollectionId
-          });
+            variableInfos.push({
+              id: variable.id,
+              name: variable.name,
+              resolvedType: variable.resolvedType,
+              values: values,
+              collectionId: variable.variableCollectionId
+            });
+          } catch (error) {
+            console.error(`Error processing variable ${variableRef.id}:`, error);
+          }
         }
 
         // Send the variables and collections back to the UI
         figma.ui.postMessage({
           type: 'variables-result',
           variables: variableInfos,
-          collections: collections.map(collection => ({
+          collections: collections.map((collection: any) => ({
             id: collection.id,
             name: collection.name,
             modes: collection.modes
