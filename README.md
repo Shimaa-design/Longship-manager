@@ -1,0 +1,2 @@
+# Longship-manager
+Figma plugin
